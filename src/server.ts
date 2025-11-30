@@ -49,19 +49,70 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello Next level developer!");
 });
 
+// users CRUD
+
+// all users get
+app.get("/users", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM users`);
+    res.status(200).json({
+      success: true,
+      message: "users retrived successfully",
+      data: result.rows,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      datails: err,
+    });
+  }
+});
+
+// single users get
+app.get("/user/:id", async (req: Request, res: Response) => {
+  console.log(req.params.id);
+
+  try {
+    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [
+      req.params.id,
+    ]);
+    if (result.rows.length === 0){
+      res.status(404).json({
+          success: false,
+          message: "User not found",
+        })
+    }else{
+      res.status(200).json({
+        success: true,
+        message: "User fetched successfully",
+        data: result.rows[0]
+      })
+    }
+     
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      datails: err,
+    });
+  }
+});
+
+// users post
 app.post("/users", async (req: Request, res: Response) => {
   const { name, email } = req.body;
   try {
     const result = await pool.query(
       `INSERT INTO users(name, email) VALUES($1,$2) RETURNING *`,
-      [name, email] 
+      [name, email]
     );
     // console.log(result.rows[0]);
     // res.send({ message: "data inserted" });
-     res.status(201).json({
+    res.status(201).json({
       success: true,
       message: "data inserted successfully",
-      data: result.rows[0]
+      data: result.rows[0],
     });
   } catch (err: any) {
     res.status(500).json({
@@ -69,7 +120,6 @@ app.post("/users", async (req: Request, res: Response) => {
       message: err.message,
     });
   }
-
 });
 
 app.listen(port, () => {
