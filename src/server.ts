@@ -193,6 +193,7 @@ app.post("/users", async (req: Request, res: Response) => {
 
 // todos CRUD
 
+// todos post 
 app.post("/todos", async(req: Request, res: Response)=>{
   const {user_id, title} =  req.body;
 
@@ -211,6 +212,7 @@ app.post("/todos", async(req: Request, res: Response)=>{
   }
 })
 
+// todos get 
 app.get("/todos", async (req: Request, res: Response) => {
   try {
     const result = await pool.query(`SELECT * FROM todos`);
@@ -227,6 +229,29 @@ app.get("/todos", async (req: Request, res: Response) => {
     });
   }
 });
+
+// get all todos of a single user
+app.get("/todos/user/:userId", async (req: Request, res: Response) => {
+  const userId = Number(req.params.userId);
+
+  if (Number.isNaN(userId)) {
+    return res.status(400).json({ success: false, message: "Invalid user id" });
+  }
+
+  try {
+    const result = await pool.query(`SELECT * FROM todos WHERE user_id = $1 ORDER BY id`, [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "No todos found for this user" });
+    }
+
+    res.status(200).json({ success: true, message: "Todos fetched successfully", data: result.rows });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message, details: err });
+  }
+});
+
+
 
 app.use((req,res)=> {
   res.status(400).json({
