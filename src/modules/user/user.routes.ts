@@ -1,5 +1,5 @@
-import express, { Request, Response } from "express";
-import { pool } from "../../config/db";
+import express from "express";
+// import { pool } from "../../config/db";
 import { userControllers } from "./user.controller";
 
 const router = express.Router();
@@ -7,23 +7,10 @@ const router = express.Router();
 
 // app.use("/users", userRoutes)
 //router -> controller -> service
-router.post("/", userControllers.createUser)
-
-router.get('/',  async (req: Request, res: Response) => {
-  try {
-    const result = await pool.query(`SELECT * FROM users`);
-    res.status(200).json({
-      success: true,
-      message: "users retrived successfully",
-      data: result.rows,
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-      datails: err,
-    });
-  }
-})
+router.post("/", userControllers.createUser);
+router.get('/',  userControllers.getUser);
+router.get('/:id', userControllers.getSingleUser);
+router.delete('/:id', userControllers.deleteUser);
+router.put('/:id', userControllers.updateUser);
 
 export const userRoute = router;
