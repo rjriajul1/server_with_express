@@ -4,6 +4,7 @@ import initDB, { pool } from "./config/db";
 import logger from "./middleware/logger";
 import { userRoute } from "./modules/user/user.routes";
 import { todoRoutes } from "./modules/todo/todo.routes";
+import { authRoutes } from "./modules/auth/auth.routes";
 const app = express();
 
 const port = config.port;
@@ -24,6 +25,10 @@ app.use("/users", userRoute);
 // todos CRUD
 app.use("/todos", todoRoutes);
 
+
+// auth routes
+
+app.use("/auth", authRoutes);
 
 // get all todos of a single user
 // app.get("/todos/user/:userId", async (req: Request, res: Response) => {
